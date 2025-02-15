@@ -23,9 +23,15 @@ export function ProductCard({
   const [price, setPrice] = useState(0)
 
   useEffect(() => {
-    // Generate a random price between 5000 and 20000
-    setPrice(Math.floor(Math.random() * (20000 - 5000 + 1) + 5000))
-  }, [])
+    const storedPrice = localStorage.getItem(`price-${name}`)
+    if (storedPrice) {
+      setPrice(Number(storedPrice)) 
+    } else {
+      const newPrice = Math.floor(Math.random() * (50000 - 4000 + 1) + 4000) // Generate price ₹4000 - ₹50000
+      localStorage.setItem(`price-${name}`, newPrice.toString()) // Store price in localStorage
+      setPrice(newPrice)
+    }
+  }, [name])
 
   const handleAddToCart = () => {
     onAddToCart({ name, price })
@@ -42,32 +48,42 @@ export function ProductCard({
       <p className="text-center font-bold mb-3">₹{price.toLocaleString()}</p>
       <div className="flex gap-2">
         <Button
-          className="w-1/2 bg-[#aa70a7] hover:bg-[#aa70a7]/90 text-white text-sm h-auto md:h-10 py-3 md:py-2 flex items-center justify-center gap-2"
+          className="w-1/2 bg-[#aa70a7] hover:bg-[#aa70a7]/90 text-white text-[10px] h-auto md:h-10 py-1 md:py-1.5 flex items-center justify-center gap-1 flex-shrink-0"
           onClick={() => setIsModalOpen(true)}
         >
-          <Camera className="w-4 h-4" />
+          <Camera className="w-3 h-3" />
           TRY-ON
         </Button>
         <Button
-          className="w-1/2 bg-[#28b4a4] hover:bg-[#28b4a4]/90 text-white text-sm h-auto md:h-10 py-3 md:py-2 flex items-center justify-center gap-2"
+          className="w-1/2 bg-[#28b4a4] hover:bg-[#28b4a4]/90 text-white text-[10px] h-auto md:h-10 py-1 md:py-1.5 flex items-center justify-center gap-1 flex-shrink-0"
           onClick={handleAddToCart}
         >
-          <ShoppingCart className="w-4 h-4" />
+          <ShoppingCart className="w-3 h-3" />
           ADD TO CART
         </Button>
       </div>
       {isModalOpen && (
-        <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
-          {tryOnLink ? (
-            <iframe src={tryOnLink} className="w-full h-full border-0" allow="camera" title="Virtual Try-On" />
-          ) : (
-            <div className="flex items-center justify-center h-full">
-              <p className="text-xl font-semibold">Virtual Try-On coming soon</p>
-            </div>
-          )}
-        </Modal>
-      )}
+  <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
+    <div className="w-[90vw] md:w-[60vw] h-[75vh] md:h-[80vh] flex flex-col bg-white p-4 rounded-lg shadow-lg overflow-hidden">
+      <div className="flex-1 overflow-y-auto">
+        {tryOnLink ? (
+          <iframe
+            src={tryOnLink}
+            className="w-full h-full border-0 rounded-lg"
+            allow="camera"
+            title="Virtual Try-On"
+            style={{ overflow: "auto", maxHeight: "100%" }}
+          />
+        ) : (
+          <div className="flex items-center justify-center h-full">
+            <p className="text-xl font-semibold">Virtual Try-On coming soon</p>
+          </div>
+        )}
+      </div>
+    </div>
+  </Modal>
+)}
+
     </div>
   )
 }
-
